@@ -7,6 +7,20 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import ExpressBrute from "express-brute";
 
+
+//define whitelist RegEx Patterns 
+
+const regexPatterns = {
+  fullName: /^[A-Za-z ]{1,50}$/,
+  idNumber: /^[0-9]{6,20}$/,
+  accountNumber: /^[0-9]{6,20}$/,
+  username: /^[A-Za-z0-9_]{3,20}$/,
+  password: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,20}$/,
+  amount: /^[0-9]+(\.[0-9]{1,2})?$/,
+  currency: /^[A-Z]{3}$/
+};
+
+
 const router = express.Router();
 
 var store = new ExpressBrute.MemoryStore();
@@ -36,9 +50,22 @@ router.post("/signup", async(req,res)=>{
     try{
         const { fullName, idNumber, accountNumber, username, password } = req.body;
 
+        //check all fields are present
         if(!fullName || !idNumber || !accountNumber || !username || !password){
             return res.status(400).json({message: "All fields are required."});
         }
+
+        //validate inputs against regex patterns
+        if(
+            !regexPatterns.fullName.test(fullName) ||
+            !regexPatterns.idNumber.test(idNumber) ||
+            !regexPatterns.accountNumber.test(accountNumber) ||
+            !regexPatterns.username.test(username) ||
+            !regexPatterns.password.test(password)
+        ){
+            return res.status(400).json({message: "Invalid input format."});
+        }
+        //hashing & saving 
         const collection = await db.collection("users");
 
         const existing = await collection.findOne({
@@ -84,6 +111,15 @@ router.post("/login",bruteforce.prevent, async (req,res)=>{
             .status(400)
             .json({message: "Username, account number and password are required."});
         }
+        //validate inputs against regex patterns
+        if(
+            !regexPatterns.username.test(username) ||
+            !regexPatterns.accountNumber.test(accountNumber) ||
+            !regexPatterns.password.test(password)
+        ){
+            return res.status(400).json({message: "Invalid input format."});
+        }
+
 
         const collection = await db.collection("users");
         const user = await collection.findOne({username, accountNumber});
@@ -128,6 +164,13 @@ router.post("/payments",authenticateToken, async (req,res)=>{
 
         if(!amount || !currency || !provider) {
             return res.status(400).json({message: "Amount, currency and provider are required."});
+        }
+           //validate inputs against regex patterns
+        if (
+         !regexPatterns.amount.test(amount) ||
+         !regexPatterns.currency.test(currency)
+        ) {
+         return res.status(400).json({ message: "Invalid amount or currency format." });
         }
 
         const validProviders = ["SWIFT", "PayPal","Stripe"];
