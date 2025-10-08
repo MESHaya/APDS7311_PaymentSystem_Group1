@@ -1,6 +1,6 @@
 import https from "https";
 import fs from "fs";
-import express from "express";
+import express from "express"
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -13,13 +13,13 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-// ✅ Load SSL certificate and key
+// Load SSL certificate and key
 const options = {
   key: fs.readFileSync("keys/privatekey.pem"),
   cert: fs.readFileSync("keys/certificate.pem"),
 };
 
-// ✅ Security middlewares
+//  Security middlewares
 app.use(helmet()); // adds secure HTTP headers
 app.use(cors({
   origin: process.env.FRONTEND_ORIGIN || "*", // restrict this in production
@@ -29,10 +29,10 @@ app.use(xssClean()); // cleans user input to prevent XSS
 app.use(express.json({ limit: "10kb" })); // limits payload size
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Logging requests
+//Logging requests
 app.use(morgan("combined"));
 
-// ✅ Rate limiting (prevents brute-force/DDoS)
+// Rate limiting (prevents brute-force/DDoS)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 200, // max 200 requests per 15min per IP
@@ -40,7 +40,7 @@ const apiLimiter = rateLimit({
 });
 app.use(apiLimiter);
 
-// ✅ CORS headers
+// CORS headers
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "*");
@@ -48,15 +48,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Use routes
+// Use routes
 app.use("/user", users);
 
-// ✅ Simple error handler
+// Simple error handler
 app.use((err, req, res, next) => {
   console.error("Global Error:", err);
   res.status(err.status || 500).json({ message: err.message || "Server error" });
 });
 
-// ✅ Create HTTPS server
+//  Create HTTPS server
 const server = https.createServer(options, app);
 server.listen(PORT, () => console.log(`Secure server running on port ${PORT}`));
