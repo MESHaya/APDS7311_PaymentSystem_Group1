@@ -31,10 +31,6 @@ jobs:
     - name: 🔐 Run npm audit for vulnerabilities
       run: npm audit --audit-level=moderate || true
 
-    - name: 🧪 Run Snyk (optional - requires Snyk account)
-      uses: snyk/actions/node@master
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
     - name: 🏗 Build React App
       run: |
