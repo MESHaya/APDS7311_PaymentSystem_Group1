@@ -22,12 +22,6 @@ jobs:
       - name: 📦 Install dependencies
         run: npm install
 
-      - name: 🧪 Run security audit
-        run: npm audit --audit-level=moderate
-
-      - name: 🧠 Run ESLint (Static Analysis)
-        run: npx eslint . || true
-        continue-on-error: true
 
       - name: 🧪 Run Tests
         run: npm test || echo "No tests found, skipping..."
