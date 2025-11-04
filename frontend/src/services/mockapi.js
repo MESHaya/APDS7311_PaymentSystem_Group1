@@ -11,6 +11,48 @@ const savePayments = () => {
     localStorage.setItem('mockPayments', JSON.stringify(payments));
 };
 
+// Initialize staff data directly
+const initializeStaffData = () => {
+    const storedStaff = localStorage.getItem('mockStaff');
+    if (!storedStaff) {
+        const staffMembers = [
+            {
+                username: 'admin',
+                password: 'Admin123!',
+                role: 'admin',
+                name: 'System Administrator',
+                fullName: 'Admin User',
+                permissions: ['view_users', 'view_payments', 'manage_users', 'manage_payments']
+            },
+            {
+                username: 'staff1',
+                password: 'Staff123!',
+                role: 'staff',
+                name: 'Support Staff',
+                fullName: 'Staff User',
+                permissions: ['view_users', 'view_payments']
+            },
+            {
+                username: 'manager',
+                password: 'Manager123!',
+                role: 'manager',
+                name: 'Operations Manager',
+                fullName: 'Manager User',
+                permissions: ['view_users', 'view_payments', 'manage_payments']
+            }
+        ];
+        localStorage.setItem('mockStaff', JSON.stringify(staffMembers));
+        return staffMembers;
+    }
+    return JSON.parse(storedStaff);
+};
+
+// Get staff members
+const getStaffMembers = () => {
+    return initializeStaffData();
+};
+
+
 /*
 export const registerUser = async (userData) => {
     return new Promise((resolve, reject) => {
@@ -53,28 +95,37 @@ export const registerUser = async (userData) => {
  * Staff login
  */
 export const loginStaff = async (credentials) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/staff/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(credentials),
-        });
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            try {
+                const staffMembers = getStaffMembers(); // Get staff data
+                
+                const staffMember = staffMembers.find(s => 
+                    s.username === credentials.username && 
+                    s.password === credentials.password
+                );
 
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || "Staff login failed");
-        }
-
-        return data;
-    } catch (error) {
-        console.error("Staff login API error:", error);
-        throw error;
-    }
+                if (staffMember) {
+                    resolve({
+                        message: "Staff login successful.",
+                        token: "staff-jwt-token-" + Date.now(),
+                        staff: {
+                            username: staffMember.username,
+                            role: staffMember.role,
+                            name: staffMember.name,
+                            fullName: staffMember.fullName,
+                            permissions: staffMember.permissions
+                        },
+                    });
+                } else {
+                    reject(new Error("Invalid staff credentials"));
+                }
+            } catch (error) {
+                reject(new Error("Staff login failed: " + error.message));
+            }
+        }, 1000);
+    });
 };
-
 /**
  * Staff: Register new user
  */
