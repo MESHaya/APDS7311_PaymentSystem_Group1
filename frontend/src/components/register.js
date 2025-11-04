@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../services/mockapi"; // Temp
+//import { registerUser } from "../services/mockapi"; // Temp
 
 function Register(){
     const navigate = useNavigate();

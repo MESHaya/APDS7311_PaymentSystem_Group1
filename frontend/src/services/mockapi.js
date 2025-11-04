@@ -11,6 +11,7 @@ const savePayments = () => {
     localStorage.setItem('mockPayments', JSON.stringify(payments));
 };
 
+/*
 export const registerUser = async (userData) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -46,6 +47,180 @@ export const registerUser = async (userData) => {
         }, 1000);
     });
 };
+*/
+
+/**
+ * Staff login
+ */
+export const loginStaff = async (credentials) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/staff/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(credentials),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Staff login failed");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Staff login API error:", error);
+        throw error;
+    }
+};
+
+/**
+ * Staff: Register new user
+ */
+export const registerUserByStaff = async (userData) => {
+    try {
+        const token = localStorage.getItem("staffToken");
+        
+        if (!token) {
+            throw new Error("No staff authentication token found.");
+        }
+
+        const response = await fetch(`${API_BASE_URL}/staff/register-user`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify(userData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem("staffToken");
+                localStorage.removeItem("staff");
+                throw new Error("Session expired. Please login again.");
+            }
+            throw new Error(data.message || "User registration failed");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Register user by staff error:", error);
+        throw error;
+    }
+};
+
+/**
+ * Staff: Get all users
+ */
+export const getAllUsers = async () => {
+    try {
+        const token = localStorage.getItem("staffToken");
+        
+        if (!token) {
+            throw new Error("No staff authentication token found.");
+        }
+
+        const response = await fetch(`${API_BASE_URL}/staff/users`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem("staffToken");
+                localStorage.removeItem("staff");
+                throw new Error("Session expired. Please login again.");
+            }
+            throw new Error(data.message || "Failed to fetch users");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Get all users error:", error);
+        throw error;
+    }
+};
+
+/**
+ * Staff: Get all payments
+ */
+export const getAllPayments = async () => {
+    try {
+        const token = localStorage.getItem("staffToken");
+        
+        if (!token) {
+            throw new Error("No staff authentication token found.");
+        }
+
+        const response = await fetch(`${API_BASE_URL}/staff/payments`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem("staffToken");
+                localStorage.removeItem("staff");
+                throw new Error("Session expired. Please login again.");
+            }
+            throw new Error(data.message || "Failed to fetch payments");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Get all payments error:", error);
+        throw error;
+    }
+};
+
+/**
+ * Staff: Get dashboard statistics
+ */
+export const getDashboardStats = async () => {
+    try {
+        const token = localStorage.getItem("staffToken");
+        
+        if (!token) {
+            throw new Error("No staff authentication token found.");
+        }
+
+        const response = await fetch(`${API_BASE_URL}/staff/dashboard-stats`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem("staffToken");
+                localStorage.removeItem("staff");
+                throw new Error("Session expired. Please login again.");
+            }
+            throw new Error(data.message || "Failed to fetch dashboard stats");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Get dashboard stats error:", error);
+        throw error;
+    }
+};
+
 
 export const loginUser = async (credentials) => {
     return new Promise((resolve, reject) => {

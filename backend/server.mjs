@@ -9,6 +9,7 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import users from "./routes/user.mjs";
 import payments from "./routes/payment.mjs"; // to payment routes
+import staff from "./routes/staff.mjs"; //staff
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -52,6 +53,7 @@ app.use((req, res, next) => {
 // Use routes
 app.use("/user", users);        //New Routes: /user/signup, /user/login
 app.use("/payment", payments);   //New Routes: /payment/payments
+app.use("/staff", staff);    //New Routes: /staff/
 
 // Simple error handler
 app.use((err, req, res, next) => {

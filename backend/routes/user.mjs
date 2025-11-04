@@ -22,6 +22,7 @@ const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET || "this_secret_should_be_longer_and_kept_safe";
 const JWT_EXPIRES_IN = "1h";
 
+/*
 // Sign up
 router.post("/signup", async (req, res) => {
   try {
@@ -79,6 +80,7 @@ router.post("/signup", async (req, res) => {
     res.status(500).json({ message: "Signup failed." });
   }
 });
+*/
 
 // Login
 router.post("/login", bruteforce.prevent, async (req, res) => {
