@@ -65,7 +65,7 @@ jobs:
         continue-on-error: true
 
       - name: 📈 Upload SAST Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: sast-reports
@@ -137,7 +137,7 @@ jobs:
         continue-on-error: true
 
       - name: 📈 Upload SCA Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: sca-reports
@@ -303,7 +303,7 @@ jobs:
     if: always()
     steps:
       - name: 📥 Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: 📊 Generate Security Summary
         run: |
@@ -319,7 +319,7 @@ jobs:
           cat security-report.md
 
       - name: 📈 Upload Security Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-summary
           path: security-report.md
