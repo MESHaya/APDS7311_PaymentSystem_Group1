@@ -7,7 +7,8 @@ import rateLimit from "express-rate-limit";
 import xssClean from "xss-clean";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import users from "./routes/user.mjs"; // your routes
+import users from "./routes/user.mjs";
+import payments from "./routes/payment.mjs"; // to payment routes
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -19,7 +20,7 @@ const options = {
   cert: fs.readFileSync("keys/certificate.pem"),
 };
 
-//  Security middlewares
+// Security middlewares
 app.use(helmet()); // adds secure HTTP headers
 app.use(cors({
   origin: process.env.FRONTEND_ORIGIN || "*", // restrict this in production
@@ -29,7 +30,7 @@ app.use(xssClean()); // cleans user input to prevent XSS
 app.use(express.json({ limit: "10kb" })); // limits payload size
 app.use(express.urlencoded({ extended: true }));
 
-//Logging requests
+// Logging requests
 app.use(morgan("combined"));
 
 // Rate limiting (prevents brute-force/DDoS)
@@ -40,7 +41,7 @@ const apiLimiter = rateLimit({
 });
 app.use(apiLimiter);
 
-// CORS headers
+// CORS headers 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "*");
@@ -49,7 +50,8 @@ app.use((req, res, next) => {
 });
 
 // Use routes
-app.use("/user", users);
+app.use("/user", users);        //New Routes: /user/signup, /user/login
+app.use("/payment", payments);   //New Routes: /payment/payments
 
 // Simple error handler
 app.use((err, req, res, next) => {
@@ -57,6 +59,6 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || "Server error" });
 });
 
-//  Create HTTPS server
+// Create HTTPS server
 const server = https.createServer(options, app);
 server.listen(PORT, () => console.log(`Secure server running on port ${PORT}`));
