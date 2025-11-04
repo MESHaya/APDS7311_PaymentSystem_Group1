@@ -36,7 +36,7 @@ function Login() {
             localStorage.setItem("token", response.token);
             localStorage.setItem("user", JSON.stringify(response.user));
             alert("Login successful!");
-            navigate("/dashboard");//Not yet created, dashboard for payments
+            navigate("/dashboard");//dashboard for payments created in app.js
         } catch (err) {
             console.error("Login error:", err);
             setError(err.message || "Login failed. Please check your credentials.");

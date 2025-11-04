@@ -1,3 +1,5 @@
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
+
 // Simple in-memory mock database
 let users = JSON.parse(localStorage.getItem('mockUsers')) || [];
 
@@ -67,4 +69,75 @@ export const loginUser = async (credentials) => {
             }
         }, 1000);
     });
+};
+
+/*payment*/
+export const createPayment = async (paymentData) => {
+    try {
+        const token = localStorage.getItem("token");
+        
+        if (!token) {
+            throw new Error("No authentication token found. Please login.");
+        }
+
+        const response = await fetch(`${API_BASE_URL}/payment/payments`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`, // JWT token for authentication
+            },
+            body: JSON.stringify(paymentData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // Handle expired token
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                throw new Error("Session expired. Please login again.");
+            }
+            throw new Error(data.message || "Payment creation failed");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Payment API error:", error);
+        throw error;
+    }
+};
+
+/*history payments*/
+export const getPaymentHistory = async () => {
+    try {
+        const token = localStorage.getItem("token");
+        
+        if (!token) {
+            throw new Error("No authentication token found. Please login.");
+        }
+
+        const response = await fetch(`${API_BASE_URL}/payment/payments`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                throw new Error("Session expired. Please login again.");
+            }
+            throw new Error(data.message || "Failed to fetch payment history");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Get payment history error:", error);
+        throw error;
+    }
 };
