@@ -203,7 +203,7 @@ jobs:
 
       # 🆕 ADVANCED: Supply Chain Security with Scorecard
       - name: 🔒 OpenSSF Scorecard
-        uses: ossf/scorecard-action@v2
+        uses: ossf/scorecard-action@v1.2.0
         with:
           results_file: scorecard-results.sarif
           results_format: sarif
