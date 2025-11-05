@@ -26,7 +26,7 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: ["http://localhost:3003","http://localhost:3004", "https://localhost:3003"], // Changed to 3003 to match your frontend
+    origin: ["http://localhost:3001","http://localhost:3003","http://localhost:3004", "https://localhost:3003"], // Changed to 3003 to match your frontend
     credentials: true,
   })
 );
