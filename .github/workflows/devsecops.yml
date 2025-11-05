@@ -520,23 +520,7 @@ jobs:
           output: nuclei-results.txt
         continue-on-error: true
 
-      # 🆕 ADVANCED: API Fuzzing
-      - name: 🎯 RESTler API Fuzzing
-        run: |
-          echo "🎯 API Fuzzing test..."
-          # Install and run basic fuzzing
-          pip install hypothesis
-          
-          # Fuzz authentication endpoint
-          for i in {1..50}; do
-            random_payload=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-            curl -X POST http://localhost:3000/api/auth/login \
-              -H "Content-Type: application/json" \
-              -d "{\"username\":\"$random_payload\",\"password\":\"$random_payload\"}" > /dev/null 2>&1 || true
-          done
-          
-          echo "✅ API fuzzing completed"
-        continue-on-error: true
+
 
       # 🆕 ADVANCED: SSL/TLS Configuration Testing
       - name: 🔐 SSL/TLS Security Test
