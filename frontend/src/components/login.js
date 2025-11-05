@@ -113,6 +113,25 @@ function Login() {
                     {loading ? "Logging in..." : "Login"}
                 </button>
             </form>
+
+            <div style={{ textAlign: 'center', marginTop: '15px' }}>
+    <span style={{ color: '#666' }}>Don't have an account? </span>
+    <button
+        type="button"
+        onClick={() => navigate("/register")}
+        style={{
+            background: 'none',
+            border: 'none',
+            color: '#007bff',
+            cursor: 'pointer',
+            textDecoration: 'underline',
+            padding: 0,
+            fontSize: '14px'
+        }}
+    >
+        Register here
+    </button>
+</div>
         </div>
     );
 }

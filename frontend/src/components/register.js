@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-//import { registerUser } from "../services/mockapi"; // Temp
+import { registerUser } from "../services/api";
 
 function Register(){
     const navigate = useNavigate();
@@ -116,7 +116,7 @@ function Register(){
                     <input 
                         name="password" 
                         type="password" 
-                        placeholder="Password (min. 6 characters)" 
+                        placeholder="Password (min. 8 characters)" 
                         value={formData.password}
                         onChange={handleChange}
                         style={{ width: '100%', margin: '5px 0', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}

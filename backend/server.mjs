@@ -22,53 +22,33 @@ const HTTP_PORT = process.env.HTTP_PORT || 8080;
 
 const app = express();
 
-// Load SSL certificate and key
-const options = {
-  key: fs.readFileSync("keys/privatekey.pem"),
-  cert: fs.readFileSync("keys/certificate.pem"),
-};
-
-// ✅ Security middlewares
-app.use(helmet()); // Adds secure HTTP headers
+// ✅ Security middlewares (BEFORE routes!)
+app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN || "*", // Restrict this in production
+    origin: ["http://localhost:3003","http://localhost:3004", "https://localhost:3003"], // Changed to 3003 to match your frontend
     credentials: true,
   })
 );
-app.use(xssClean()); // Cleans user input to prevent XSS
-app.use(express.json({ limit: "10kb" })); // Limits payload size
+app.use(xssClean());
+app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
-
-// ✅ Logging requests
 app.use(morgan("combined"));
-
-// ✅ Cookie parser
 app.use(cookieParser());
-
-// ✅ Sanitize MongoDB inputs
 app.use(mongoSanitize());
 
-// ✅ Rate limiting (prevents brute-force/DDoS)
+// ✅ Rate limiting
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // Max 200 requests per 15min per IP
+  windowMs: 15 * 60 * 1000,
+  max: 200,
   message: { message: "Too many requests, please try again later." },
 });
 app.use(apiLimiter);
 
-// ✅ CORS headers
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Headers", "*");
-  res.setHeader("Access-Control-Allow-Methods", "*");
-  next();
-});
-
 // ✅ Use routes
-app.use("/user", users);      // Routes: /user/signup, /user/login
-app.use("/payment", payments); // Routes: /payment/payments
-app.use("/staff", staff);      // Routes: /staff/
+app.use("/user", users);
+app.use("/payment", payments);
+app.use("/staff", staff);
 
 // ✅ Simple error handler
 app.use((err, req, res, next) => {
@@ -76,13 +56,23 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || "Server error" });
 });
 
-// ✅ Create HTTPS server
+// FOR DEVELOPMENT: Use HTTP only
+app.listen(3000, () => {
+  console.log("✅ Dev server running on http://localhost:3000");
+});
+
+/* COMMENT OUT HTTPS FOR NOW - USE IN PRODUCTION
+// Load SSL certificate and key
+const options = {
+  key: fs.readFileSync("./keys/privatekey.pem"),
+  cert: fs.readFileSync("./keys/certificate.pem"),
+};
+
 const httpsServer = https.createServer(options, app);
 httpsServer.listen(HTTPS_PORT, () => {
   console.log(`✅ Secure HTTPS server running on https://localhost:${HTTPS_PORT}`);
 });
 
-// ✅ Create HTTP server to warn users (optional redirect alternative below)
 const httpServer = http.createServer((req, res) => {
   res.writeHead(426, { "Content-Type": "application/json" });
   res.end(
@@ -95,5 +85,5 @@ const httpServer = http.createServer((req, res) => {
 
 httpServer.listen(HTTP_PORT, () => {
   console.log(`🚫 Plain HTTP catcher listening on http://localhost:${HTTP_PORT}`);
-  console.log(`→ HTTP requests will receive a JSON error advising HTTPS.`);
 });
+*/

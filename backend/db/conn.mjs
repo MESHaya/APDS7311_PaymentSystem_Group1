@@ -9,7 +9,12 @@ const connectionString = process.env.ATLAS_URI || "";
 
 console.log(connectionString);
 
-const client = new MongoClient(connectionString);
+const client = new MongoClient(connectionString, {
+  tls: true,
+  tlsAllowInvalidCertificates: true, //  FIX
+    tlsAllowInvalidHostnames: true,  // ADD THIS
+  serverSelectionTimeoutMS: 5000,
+});
 
 let conn;
 try{

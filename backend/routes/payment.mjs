@@ -11,6 +11,22 @@ const regexPatterns = {
 
 const router = express.Router();
 
+// Get all payments for the authenticated user
+router.get("/payments", authenticateToken, async (req, res) => {
+  try {
+    const collection = await db.collection("payments");
+    const payments = await collection
+      .find({ userId: new ObjectId(req.user.sub) })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    res.status(200).json(payments);
+  } catch (err) {
+    console.error("Error fetching payments: ", err);
+    res.status(500).json({ message: "Failed to fetch payments." });
+  }
+});
+
 // Create payment
 router.post("/payments", authenticateToken, async (req, res) => {
   try {
