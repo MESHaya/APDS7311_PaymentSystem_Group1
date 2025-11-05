@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUserByStaff, getAllUsers, getAllPayments, getDashboardStats } from "../services/mockapi";
+import { registerUserByStaff, getAllUsers, getAllPayments, getDashboardStats } from "../services/api"; // connecting front and back with api
 
 function StaffDashboard() {
     const navigate = useNavigate();

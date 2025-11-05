@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createPayment, getPaymentHistory } from "../services/mockapi";
+import { createPayment, getPaymentHistory } from "../services/api"; // connecting front and back with api
 
 function Payment() {
     const navigate = useNavigate();
