@@ -26,7 +26,7 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: ["http://localhost:3001","http://localhost:3003","http://localhost:3004", "https://localhost:3003"], // Changed to 3003 to match your frontend
+    origin: ["http://localhost:3001", "http://localhost:3002", "http://localhost:3003", "http://localhost:3004", "https://localhost:3003"], 
     credentials: true,
   })
 );
@@ -45,9 +45,9 @@ const apiLimiter = rateLimit({
 });
 app.use(apiLimiter);
 
-// ✅ Use routes
+// ✅ Use routes - FIXED: Changed "/payments" to "/payment"
 app.use("/user", users);
-app.use("/payment", payments);
+app.use("/payment", payments);  // ✅ Changed from "/payments" to "/payment"
 app.use("/staff", staff);
 
 // ✅ Simple error handler

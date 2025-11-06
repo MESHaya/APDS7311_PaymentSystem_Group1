@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUserByStaff, getAllUsers, getAllPayments, getDashboardStats } from "../services/api"; // connecting front and back with api
+import { registerUserByStaff, getAllUsers, getAllPayments, getDashboardStats, approvePayment,
+    rejectPayment } from "../services/api"; // connecting front and back with api
 
 function StaffDashboard() {
     const navigate = useNavigate();
@@ -303,21 +304,76 @@ function StaffDashboard() {
                                             <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{payment.amount}</td>
                                             <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{payment.currency}</td>
                                             <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{payment.provider}</td>
-                                            <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-                                                <span style={{ 
-                                                    padding: '4px 8px', 
-                                                    borderRadius: '4px',
-                                                    backgroundColor: payment.status === 'pending' ? '#ffc107' : '#28a745',
-                                                    color: 'white',
-                                                    fontSize: '12px'
-                                                }}>
-                                                    {payment.status}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-                                                {new Date(payment.createdAt).toLocaleDateString()}
-                                            </td>
-                                        </tr>
+                                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+    {payment.status === "pending" ? (
+        <div style={{ display: "flex", gap: "10px" }}>
+            <button
+                onClick={async () => {
+                    try {
+                        await approvePayment(payment._id);
+                        setSuccess("Payment approved!");
+                        loadPayments();
+                        loadDashboardStats();
+                    } catch (err) {
+                        setError("Failed to approve payment");
+                    }
+                }}
+                style={{
+                    padding: "6px 12px",
+                    backgroundColor: "#28a745",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                }}
+            >
+                Approve
+            </button>
+
+            <button
+                onClick={async () => {
+                    try {
+                        await rejectPayment(payment._id);
+                        setSuccess("Payment rejected!");
+                        loadPayments();
+                        loadDashboardStats();
+                    } catch (err) {
+                        setError("Failed to reject payment");
+                    }
+                }}
+                style={{
+                    padding: "6px 12px",
+                    backgroundColor: "red",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                }}
+            >
+                Reject
+            </button>
+        </div>
+    ) : (
+        <span
+            style={{
+                padding: "4px 8px",
+                borderRadius: "4px",
+                backgroundColor:
+                    payment.status === "approved" ? "#28a745" :
+                    payment.status === "rejected" ? "red" :
+                    "#ffc107",
+                color: "white",
+                fontSize: "12px",
+            }}
+        >
+            {payment.status}
+        </span>
+    )}
+</td>
+<td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+    {new Date(payment.createdAt).toLocaleDateString()}
+</td>
+     </tr>
                                     ))}
                                 </tbody>
                             </table>

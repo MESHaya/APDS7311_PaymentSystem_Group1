@@ -83,6 +83,41 @@ router.post("/login", bruteforce.prevent, async (req, res) => {
   }
 });
 
+// TEMPORARY ROUTE - Remove after creating admin user!
+router.post("/create-admin", async (req, res) => {
+  try {
+    const collection = await db.collection("staff");
+    
+    // Check if admin already exists
+    const existing = await collection.findOne({ username: "admin" });
+    if (existing) {
+      return res.status(409).json({ message: "Admin already exists!" });
+    }
+
+    const hashedPassword = await bcrypt.hash("Admin@123", SALT_ROUNDS);
+
+    const newStaff = {
+      username: "admin",
+      password: hashedPassword,
+      fullName: "Admin User",
+      role: "staff",
+      createdAt: new Date(),
+    };
+
+    const result = await collection.insertOne(newStaff);
+
+    res.status(201).json({
+      message: "Admin user created successfully!",
+      admin: {
+        id: result.insertedId,
+        username: "admin"
+      }
+    });
+  } catch (err) {
+    console.error("Create admin error:", err);
+    res.status(500).json({ message: "Failed to create admin." });
+  }
+});
 // Staff: Register new user (only staff can do this)
 router.post("/register-user", authenticateToken, requireStaff, async (req, res) => {
   try {

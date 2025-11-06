@@ -140,6 +140,11 @@ function Payment() {
                                     <td style={{ padding: '8px' }}>{payment.amount}</td>
                                     <td style={{ padding: '8px' }}>{payment.currency}</td>
                                     <td style={{ padding: '8px' }}>{payment.provider}</td>
+                                     <td style={{ padding: '8px', fontWeight: 'bold' }}>
+                    {payment.status === "approved" && <span style={{ color: 'green' }}>✅ Approved</span>}
+                    {payment.status === "pending" && <span style={{ color: '#ff9800' }}> Pending</span>}
+                    {payment.status === "rejected" && <span style={{ color: 'red' }}>❌ Rejected</span>}
+                </td>
                                 </tr>
                             ))}
                         </tbody>

@@ -61,7 +61,7 @@ export const createPayment = async (paymentData) => {
     throw new Error("No authentication token found. Please login.");
   }
 
-  return fetchAPI("/payment/payments", {
+  return fetchAPI("/payment", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -70,6 +70,21 @@ export const createPayment = async (paymentData) => {
   });
 };
 
+export const approvePayment = async (paymentId) => {
+  const token = localStorage.getItem("staffToken");
+  return fetchAPI(`/payment/approve/${paymentId}`, {  // Removed extra "payment"
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const rejectPayment = async (paymentId) => {
+  const token = localStorage.getItem("staffToken");
+  return fetchAPI(`/payment/reject/${paymentId}`, {  // Removed extra "payment"
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
 /**
  * Get user's payment history (if you implement this endpoint later)
  */
@@ -80,7 +95,7 @@ export const getPaymentHistory = async () => {
     throw new Error("No authentication token found. Please login.");
   }
 
-  return fetchAPI("/payment/payments", {
+  return fetchAPI("/payment", {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,

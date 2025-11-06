@@ -132,6 +132,25 @@ function Login() {
         Register here
     </button>
 </div>
+
+<div style={{ textAlign: 'center', marginTop: '10px' }}>
+    <span style={{ color: '#666' }}>Staff member? </span>
+    <button
+        type="button"
+        onClick={() => navigate("/staff/login")}
+        style={{
+            background: 'none',
+            border: 'none',
+            color: '#28a745',
+            cursor: 'pointer',
+            textDecoration: 'underline',
+            padding: 0,
+            fontSize: '14px'
+        }}
+    >
+        Staff Login
+    </button>
+</div>
         </div>
     );
 }

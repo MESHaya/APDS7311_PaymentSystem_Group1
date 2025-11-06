@@ -10,16 +10,19 @@ function StaffLogin() {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         setError("");
+        setSuccessMessage("");
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError("");
+        setSuccessMessage("");
 
         if (!formData.username || !formData.password) {
             setError("All fields are required");
@@ -44,6 +47,37 @@ function StaffLogin() {
         }
     };
 
+    // Function to create admin user
+    const handleCreateAdmin = async () => {
+        setLoading(true);
+        setError("");
+        setSuccessMessage("");
+
+        try {
+            const response = await fetch("http://localhost:3000/staff/create-admin", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSuccessMessage("Admin user created! Username: admin, Password: Admin@123");
+                // Auto-fill the form
+                setFormData({ username: "admin", password: "Admin@123" });
+            } else {
+                setError(data.message || "Failed to create admin user");
+            }
+        } catch (err) {
+            console.error("Create admin error:", err);
+            setError("Failed to create admin user. Make sure the server is running.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
@@ -61,6 +95,19 @@ function StaffLogin() {
                     borderRadius: '4px'
                 }}>
                     {error}
+                </div>
+            )}
+
+            {successMessage && (
+                <div style={{ 
+                    color: 'green', 
+                    marginBottom: '15px', 
+                    padding: '10px', 
+                    backgroundColor: '#e6ffe6', 
+                    border: '1px solid green',
+                    borderRadius: '4px'
+                }}>
+                    {successMessage}
                 </div>
             )}
             
@@ -106,6 +153,25 @@ function StaffLogin() {
                     {loading ? "Logging in..." : "Staff Login"}
                 </button>
             </form>
+
+            {/* CREATE ADMIN BUTTON - REMOVE AFTER FIRST USE */}
+            <button 
+                onClick={handleCreateAdmin}
+                disabled={loading}
+                style={{ 
+                    width: '100%', 
+                    margin: '10px 0', 
+                    padding: '12px', 
+                    backgroundColor: loading ? '#ccc' : '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    fontSize: '16px'
+                }}
+            >
+                🔧 Create Admin User (First Time Setup)
+            </button>
             
             <p style={{ textAlign: 'center', marginTop: '15px' }}>
                 <button 
