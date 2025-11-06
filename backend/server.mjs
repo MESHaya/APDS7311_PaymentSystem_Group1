@@ -14,15 +14,19 @@ import dotenv from "dotenv";
 import users from "./routes/user.mjs";
 import payments from "./routes/payment.mjs";
 import staff from "./routes/staff.mjs";
+import initializeAdmin from "./db/initAdmin.mjs";
 
 dotenv.config();
+
+// Initialize default admin user
+initializeAdmin();
 
 const HTTPS_PORT = process.env.HTTPS_PORT || 3000;
 const HTTP_PORT = process.env.HTTP_PORT || 8080;
 
 const app = express();
 
-// ✅ Security middlewares (BEFORE routes!)
+// Security middlewares (BEFORE routes!)
 app.use(helmet());
 app.use(
   cors({
@@ -37,7 +41,7 @@ app.use(morgan("combined"));
 app.use(cookieParser());
 app.use(mongoSanitize());
 
-// ✅ Rate limiting
+// Rate limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
@@ -45,12 +49,12 @@ const apiLimiter = rateLimit({
 });
 app.use(apiLimiter);
 
-// ✅ Use routes - FIXED: Changed "/payments" to "/payment"
+// Use routes - FIXED: Changed "/payments" to "/payment"
 app.use("/user", users);
-app.use("/payment", payments);  // ✅ Changed from "/payments" to "/payment"
+app.use("/payment", payments);  // Changed from "/payments" to "/payment"
 app.use("/staff", staff);
 
-// ✅ Simple error handler
+// Simple error handler
 app.use((err, req, res, next) => {
   console.error("Global Error:", err);
   res.status(err.status || 500).json({ message: err.message || "Server error" });
