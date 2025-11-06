@@ -32,5 +32,15 @@
   "bugs": {
     "url": "https://github.com/MESHaya/APDS7311_PaymentSystem_Group1/issues"
   },
-  "homepage": "https://github.com/MESHaya/APDS7311_PaymentSystem_Group1#readme"
+  "homepage": "https://github.com/MESHaya/APDS7311_PaymentSystem_Group1#readme",
+  "devDependencies": {
+    "@jest/globals": "^30.2.0",
+    "eslint": "^9.39.1",
+    "eslint-plugin-no-secrets": "^2.2.1",
+    "eslint-plugin-security": "^3.0.1",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2"
+  }
 }
