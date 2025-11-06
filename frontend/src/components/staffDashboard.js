@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUserByStaff, getAllUsers, getAllPayments, getDashboardStats, approvePayment,
-    rejectPayment } from "../services/api"; // connecting front and back with api
+import { 
+    registerUserByStaff, 
+    getAllUsers, 
+    getAllPayments, 
+    getDashboardStats, 
+    approvePayment,
+    rejectPayment,
+    getPendingStaff,
+    approveStaff,
+    rejectStaff
+} from "../services/api";
 
 function StaffDashboard() {
     const navigate = useNavigate();
     const [staff, setStaff] = useState(null);
-    const [activeTab, setActiveTab] = useState("stats"); // stats, users, payments, register
+    const [activeTab, setActiveTab] = useState("stats");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
@@ -15,6 +24,7 @@ function StaffDashboard() {
     const [stats, setStats] = useState(null);
     const [users, setUsers] = useState([]);
     const [payments, setPayments] = useState([]);
+    const [pendingStaff, setPendingStaff] = useState([]);
 
     // Register form state
     const [registerForm, setRegisterForm] = useState({
@@ -77,6 +87,18 @@ function StaffDashboard() {
         }
     };
 
+    const loadPendingStaff = async () => {
+        setLoading(true);
+        try {
+            const data = await getPendingStaff();
+            setPendingStaff(data.pendingStaff);
+        } catch (err) {
+            setError(err.message || "Failed to load pending staff");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleTabChange = (tab) => {
         setActiveTab(tab);
         setError("");
@@ -84,6 +106,7 @@ function StaffDashboard() {
         
         if (tab === "users") loadUsers();
         if (tab === "payments") loadPayments();
+        if (tab === "approvals") loadPendingStaff();
     };
 
     const handleRegisterChange = (e) => {
@@ -108,11 +131,37 @@ function StaffDashboard() {
                 username: "",
                 password: "",
             });
-            loadDashboardStats(); // Refresh stats
+            loadDashboardStats();
         } catch (err) {
             setError(err.message || "Failed to register user");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleApproveStaff = async (staffId) => {
+        try {
+            await approveStaff(staffId);
+            setSuccess("Staff member approved successfully!");
+            loadPendingStaff();
+            loadDashboardStats();
+        } catch (err) {
+            setError(err.message || "Failed to approve staff");
+        }
+    };
+
+    const handleRejectStaff = async (staffId) => {
+        if (!window.confirm("Are you sure you want to reject this staff registration?")) {
+            return;
+        }
+        
+        try {
+            await rejectStaff(staffId);
+            setSuccess("Staff registration rejected");
+            loadPendingStaff();
+            loadDashboardStats();
+        } catch (err) {
+            setError(err.message || "Failed to reject staff");
         }
     };
 
@@ -164,9 +213,10 @@ function StaffDashboard() {
                 display: 'flex', 
                 gap: '10px', 
                 marginBottom: '20px',
-                borderBottom: '2px solid #ddd'
+                borderBottom: '2px solid #ddd',
+                flexWrap: 'wrap'
             }}>
-                {["stats", "users", "payments", "register"].map(tab => (
+                {["stats", "approvals", "users", "payments", "register"].map(tab => (
                     <button
                         key={tab}
                         onClick={() => handleTabChange(tab)}
@@ -178,10 +228,26 @@ function StaffDashboard() {
                             borderBottom: activeTab === tab ? '2px solid #007bff' : 'none',
                             cursor: 'pointer',
                             fontSize: '16px',
-                            fontWeight: activeTab === tab ? 'bold' : 'normal'
+                            fontWeight: activeTab === tab ? 'bold' : 'normal',
+                            position: 'relative'
                         }}
                     >
                         {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        {tab === "approvals" && stats && stats.pendingStaff > 0 && (
+                            <span style={{
+                                position: 'absolute',
+                                top: '5px',
+                                right: '5px',
+                                backgroundColor: 'red',
+                                color: 'white',
+                                borderRadius: '50%',
+                                padding: '2px 6px',
+                                fontSize: '12px',
+                                fontWeight: 'bold'
+                            }}>
+                                {stats.pendingStaff}
+                            </span>
+                        )}
                     </button>
                 ))}
             </div>
@@ -213,32 +279,129 @@ function StaffDashboard() {
             )}
 
             {/* Stats Tab */}
-{activeTab === "stats" && stats && (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-        <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 10px 0', color: '#007bff' }}>{stats.totalUsers}</h3>
-            <p style={{ margin: '0', color: '#666' }}>Total Users</p>
-        </div>
-        <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 10px 0', color: '#28a745' }}>{stats.totalPayments}</h3>
-            <p style={{ margin: '0', color: '#666' }}>Total Payments</p>
-        </div>
-        <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 10px 0', color: '#ffc107' }}>{stats.pendingPayments}</h3>
-            <p style={{ margin: '0', color: '#666' }}>Pending Payments</p>
-        </div>
-        <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
-            <div style={{ margin: '0 0 10px 0' }}>
-                {Object.entries(stats.totalAmountByCurrency).map(([currency, amount]) => (
-                    <div key={currency} style={{ fontSize: '18px', fontWeight: 'bold', color: '#17a2b8', marginBottom: '5px' }}>
-                        {amount} {currency}
+            {activeTab === "stats" && stats && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                    <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
+                        <h3 style={{ margin: '0 0 10px 0', color: '#007bff' }}>{stats.totalUsers}</h3>
+                        <p style={{ margin: '0', color: '#666' }}>Total Users</p>
                     </div>
-                ))}
-            </div>
-            <p style={{ margin: '0', color: '#666' }}>Total by Currency</p>
-        </div>
-    </div>
-)}
+                    <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
+                        <h3 style={{ margin: '0 0 10px 0', color: '#28a745' }}>{stats.totalPayments}</h3>
+                        <p style={{ margin: '0', color: '#666' }}>Total Payments</p>
+                    </div>
+                    <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
+                        <h3 style={{ margin: '0 0 10px 0', color: '#ffc107' }}>{stats.pendingPayments}</h3>
+                        <p style={{ margin: '0', color: '#666' }}>Pending Payments</p>
+                    </div>
+                    <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
+                        <h3 style={{ margin: '0 0 10px 0', color: '#dc3545' }}>{stats.pendingStaff}</h3>
+                        <p style={{ margin: '0', color: '#666' }}>Pending Staff</p>
+                    </div>
+                    <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
+                        <div style={{ margin: '0 0 10px 0' }}>
+                            {Object.entries(stats.totalAmountByCurrency).map(([currency, amount]) => (
+                                <div key={currency} style={{ fontSize: '18px', fontWeight: 'bold', color: '#17a2b8', marginBottom: '5px' }}>
+                                    {amount} {currency}
+                                </div>
+                            ))}
+                        </div>
+                        <p style={{ margin: '0', color: '#666' }}>Total by Currency</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Staff Approvals Tab */}
+            {activeTab === "approvals" && (
+                <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', border: '1px solid #ddd' }}>
+                    <h3>Pending Staff Registrations ({pendingStaff.length})</h3>
+                    {loading ? (
+                        <p>Loading pending staff...</p>
+                    ) : pendingStaff.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                            <p style={{ fontSize: '18px', marginBottom: '10px' }}>✅ No pending staff approvals</p>
+                            <p>All staff registrations have been processed.</p>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'grid', gap: '15px' }}>
+                            {pendingStaff.map((pendingStaffMember) => (
+                                <div 
+                                    key={pendingStaffMember._id} 
+                                    style={{ 
+                                        border: '1px solid #ddd', 
+                                        borderRadius: '8px', 
+                                        padding: '20px',
+                                        backgroundColor: '#f8f9fa'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '15px' }}>
+                                        <div>
+                                            <h4 style={{ margin: '0 0 5px 0', color: '#007bff' }}>
+                                                {pendingStaffMember.fullName}
+                                            </h4>
+                                            <p style={{ margin: '0', color: '#666', fontSize: '14px' }}>
+                                                Username: <strong>{pendingStaffMember.username}</strong>
+                                            </p>
+                                            {pendingStaffMember.email && (
+                                                <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '14px' }}>
+                                                    Email: {pendingStaffMember.email}
+                                                </p>
+                                            )}
+                                            <p style={{ margin: '5px 0 0 0', color: '#999', fontSize: '12px' }}>
+                                                Applied: {new Date(pendingStaffMember.createdAt).toLocaleString()}
+                                            </p>
+                                        </div>
+                                        <span style={{ 
+                                            padding: '4px 12px', 
+                                            backgroundColor: '#ffc107', 
+                                            color: 'white',
+                                            borderRadius: '4px',
+                                            fontSize: '12px',
+                                            fontWeight: 'bold'
+                                        }}>
+                                            PENDING
+                                        </span>
+                                    </div>
+                                    
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <button
+                                            onClick={() => handleApproveStaff(pendingStaffMember._id)}
+                                            style={{
+                                                flex: 1,
+                                                padding: '10px',
+                                                backgroundColor: '#28a745',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                                fontWeight: 'bold',
+                                                fontSize: '14px'
+                                            }}
+                                        >
+                                            ✓ Approve
+                                        </button>
+                                        <button
+                                            onClick={() => handleRejectStaff(pendingStaffMember._id)}
+                                            style={{
+                                                flex: 1,
+                                                padding: '10px',
+                                                backgroundColor: '#dc3545',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                                fontWeight: 'bold',
+                                                fontSize: '14px'
+                                            }}
+                                        >
+                                            ✗ Reject
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Users Tab */}
             {activeTab === "users" && (
@@ -310,76 +473,75 @@ function StaffDashboard() {
                                             <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{payment.amount}</td>
                                             <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{payment.currency}</td>
                                             <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>{payment.provider}</td>
-                                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-    {payment.status === "pending" ? (
-        <div style={{ display: "flex", gap: "10px" }}>
-            <button
-                onClick={async () => {
-                    try {
-                        await approvePayment(payment._id);
-                        setSuccess("Payment approved!");
-                        loadPayments();
-                        loadDashboardStats();
-                    } catch (err) {
-                        setError("Failed to approve payment");
-                    }
-                }}
-                style={{
-                    padding: "6px 12px",
-                    backgroundColor: "#28a745",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                }}
-            >
-                Approve
-            </button>
-
-            <button
-                onClick={async () => {
-                    try {
-                        await rejectPayment(payment._id);
-                        setSuccess("Payment rejected!");
-                        loadPayments();
-                        loadDashboardStats();
-                    } catch (err) {
-                        setError("Failed to reject payment");
-                    }
-                }}
-                style={{
-                    padding: "6px 12px",
-                    backgroundColor: "red",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                }}
-            >
-                Reject
-            </button>
-        </div>
-    ) : (
-        <span
-            style={{
-                padding: "4px 8px",
-                borderRadius: "4px",
-                backgroundColor:
-                    payment.status === "approved" ? "#28a745" :
-                    payment.status === "rejected" ? "red" :
-                    "#ffc107",
-                color: "white",
-                fontSize: "12px",
-            }}
-        >
-            {payment.status}
-        </span>
-    )}
-</td>
-<td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-    {new Date(payment.createdAt).toLocaleDateString()}
-</td>
-     </tr>
+                                            <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                                                {payment.status === "pending" ? (
+                                                    <div style={{ display: "flex", gap: "10px" }}>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await approvePayment(payment._id);
+                                                                    setSuccess("Payment approved!");
+                                                                    loadPayments();
+                                                                    loadDashboardStats();
+                                                                } catch (err) {
+                                                                    setError("Failed to approve payment");
+                                                                }
+                                                            }}
+                                                            style={{
+                                                                padding: "6px 12px",
+                                                                backgroundColor: "#28a745",
+                                                                color: "white",
+                                                                border: "none",
+                                                                borderRadius: "4px",
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    await rejectPayment(payment._id);
+                                                                    setSuccess("Payment rejected!");
+                                                                    loadPayments();
+                                                                    loadDashboardStats();
+                                                                } catch (err) {
+                                                                    setError("Failed to reject payment");
+                                                                }
+                                                            }}
+                                                            style={{
+                                                                padding: "6px 12px",
+                                                                backgroundColor: "red",
+                                                                color: "white",
+                                                                border: "none",
+                                                                borderRadius: "4px",
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span
+                                                        style={{
+                                                            padding: "4px 8px",
+                                                            borderRadius: "4px",
+                                                            backgroundColor:
+                                                                payment.status === "approved" ? "#28a745" :
+                                                                payment.status === "rejected" ? "red" :
+                                                                "#ffc107",
+                                                            color: "white",
+                                                            fontSize: "12px",
+                                                        }}
+                                                    >
+                                                        {payment.status}
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                                                {new Date(payment.createdAt).toLocaleDateString()}
+                                            </td>
+                                        </tr>
                                     ))}
                                 </tbody>
                             </table>

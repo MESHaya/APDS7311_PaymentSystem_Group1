@@ -29,9 +29,6 @@ const fetchAPI = async (endpoint, options = {}) => {
 
 // ==================== USER APIs ====================
 
-/**
- * Register a new user (DISABLED - will return error from backend)
- */
 export const registerUser = async (userData) => {
   return fetchAPI("/user/signup", {
     method: "POST",
@@ -39,9 +36,6 @@ export const registerUser = async (userData) => {
   });
 };
 
-/**
- * Login user
- */
 export const loginUser = async (credentials) => {
   return fetchAPI("/user/login", {
     method: "POST",
@@ -51,9 +45,6 @@ export const loginUser = async (credentials) => {
 
 // ==================== PAYMENT APIs ====================
 
-/**
- * Create a payment (requires user token)
- */
 export const createPayment = async (paymentData) => {
   const token = localStorage.getItem("token");
   
@@ -72,7 +63,7 @@ export const createPayment = async (paymentData) => {
 
 export const approvePayment = async (paymentId) => {
   const token = localStorage.getItem("staffToken");
-  return fetchAPI(`/payment/approve/${paymentId}`, {  // Removed extra "payment"
+  return fetchAPI(`/payment/approve/${paymentId}`, {
     method: "PATCH",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -80,14 +71,12 @@ export const approvePayment = async (paymentId) => {
 
 export const rejectPayment = async (paymentId) => {
   const token = localStorage.getItem("staffToken");
-  return fetchAPI(`/payment/reject/${paymentId}`, {  // Removed extra "payment"
+  return fetchAPI(`/payment/reject/${paymentId}`, {
     method: "PATCH",
     headers: { Authorization: `Bearer ${token}` },
   });
 };
-/**
- * Get user's payment history (if you implement this endpoint later)
- */
+
 export const getPaymentHistory = async () => {
   const token = localStorage.getItem("token");
   
@@ -105,9 +94,6 @@ export const getPaymentHistory = async () => {
 
 // ==================== STAFF APIs ====================
 
-/**
- * Staff login
- */
 export const loginStaff = async (credentials) => {
   return fetchAPI("/staff/login", {
     method: "POST",
@@ -115,9 +101,13 @@ export const loginStaff = async (credentials) => {
   });
 };
 
-/**
- * Staff: Register new user
- */
+export const registerStaff = async (staffData) => {
+  return fetchAPI("/staff/register", {
+    method: "POST",
+    body: JSON.stringify(staffData),
+  });
+};
+
 export const registerUserByStaff = async (userData) => {
   const token = localStorage.getItem("staffToken");
   
@@ -134,9 +124,6 @@ export const registerUserByStaff = async (userData) => {
   });
 };
 
-/**
- * Staff: Get all users
- */
 export const getAllUsers = async () => {
   const token = localStorage.getItem("staffToken");
   
@@ -152,9 +139,6 @@ export const getAllUsers = async () => {
   });
 };
 
-/**
- * Staff: Get all payments
- */
 export const getAllPayments = async () => {
   const token = localStorage.getItem("staffToken");
   
@@ -170,9 +154,6 @@ export const getAllPayments = async () => {
   });
 };
 
-/**
- * Staff: Get dashboard statistics
- */
 export const getDashboardStats = async () => {
   const token = localStorage.getItem("staffToken");
   
@@ -182,6 +163,53 @@ export const getDashboardStats = async () => {
 
   return fetchAPI("/staff/dashboard-stats", {
     method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// ==================== STAFF APPROVAL APIs ====================
+
+export const getPendingStaff = async () => {
+  const token = localStorage.getItem("staffToken");
+  
+  if (!token) {
+    throw new Error("No staff authentication token found.");
+  }
+
+  return fetchAPI("/staff/pending-staff", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const approveStaff = async (staffId) => {
+  const token = localStorage.getItem("staffToken");
+  
+  if (!token) {
+    throw new Error("No staff authentication token found.");
+  }
+
+  return fetchAPI(`/staff/approve-staff/${staffId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const rejectStaff = async (staffId) => {
+  const token = localStorage.getItem("staffToken");
+  
+  if (!token) {
+    throw new Error("No staff authentication token found.");
+  }
+
+  return fetchAPI(`/staff/reject-staff/${staffId}`, {
+    method: "PATCH",
     headers: {
       Authorization: `Bearer ${token}`,
     },

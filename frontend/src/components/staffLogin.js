@@ -147,33 +147,44 @@ function StaffLogin() {
                         border: 'none',
                         borderRadius: '4px',
                         cursor: loading ? 'not-allowed' : 'pointer',
-                        fontSize: '16px'
+                        fontSize: '16px',
+                        fontWeight: 'bold'
                     }}
                 >
                     {loading ? "Logging in..." : "Staff Login"}
                 </button>
             </form>
 
-            {/* CREATE ADMIN BUTTON - REMOVE AFTER FIRST USE */}
-            <button 
-                onClick={handleCreateAdmin}
-                disabled={loading}
-                style={{ 
-                    width: '100%', 
-                    margin: '10px 0', 
-                    padding: '12px', 
-                    backgroundColor: loading ? '#ccc' : '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    fontSize: '16px'
-                }}
-            >
-                🔧 Create Admin User (First Time Setup)
-            </button>
-            
-            <p style={{ textAlign: 'center', marginTop: '15px' }}>
+        
+
+            {/* Navigation Links */}
+            <div style={{ 
+                marginTop: '20px', 
+                paddingTop: '20px', 
+                borderTop: '1px solid #ddd',
+                textAlign: 'center' 
+            }}>
+                <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '14px' }}>
+                    Don't have a staff account?
+                </p>
+                <button 
+                    onClick={() => navigate('/staff/register')}
+                    style={{ 
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        marginBottom: '10px'
+                    }}
+                >
+                    Register as Staff
+                </button>
+                
                 <button 
                     onClick={() => navigate('/')}
                     style={{ 
@@ -181,12 +192,13 @@ function StaffLogin() {
                         border: 'none', 
                         color: '#007bff', 
                         cursor: 'pointer',
-                        textDecoration: 'underline'
+                        textDecoration: 'underline',
+                        fontSize: '14px'
                     }}
                 >
                     ← Back to User Login
                 </button>
-            </p>
+            </div>
         </div>
     );
 }

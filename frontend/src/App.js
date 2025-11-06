@@ -6,6 +6,7 @@ import Register from './components/register';
 import Login from './components/login';
 import Payment from "./components/payment";
 import StaffLogin from "./components/staffLogin";
+import StaffRegister from "./components/staffRegister";
 import StaffDashboard from "./components/staffDashboard";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/dashboard" element={<Payment />} />
         {/* Staff Routes */}
         <Route path="/staff/login" element={<StaffLogin />} />
+          <Route path="/staff/register" element={<StaffRegister />} />
         <Route path="/staff/dashboard" element={<StaffDashboard />} />
       </Routes>
     </Router>
