@@ -213,26 +213,32 @@ function StaffDashboard() {
             )}
 
             {/* Stats Tab */}
-            {activeTab === "stats" && stats && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-                    <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
-                        <h3 style={{ margin: '0 0 10px 0', color: '#007bff' }}>{stats.totalUsers}</h3>
-                        <p style={{ margin: '0', color: '#666' }}>Total Users</p>
+{activeTab === "stats" && stats && (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+        <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#007bff' }}>{stats.totalUsers}</h3>
+            <p style={{ margin: '0', color: '#666' }}>Total Users</p>
+        </div>
+        <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#28a745' }}>{stats.totalPayments}</h3>
+            <p style={{ margin: '0', color: '#666' }}>Total Payments</p>
+        </div>
+        <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#ffc107' }}>{stats.pendingPayments}</h3>
+            <p style={{ margin: '0', color: '#666' }}>Pending Payments</p>
+        </div>
+        <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
+            <div style={{ margin: '0 0 10px 0' }}>
+                {Object.entries(stats.totalAmountByCurrency).map(([currency, amount]) => (
+                    <div key={currency} style={{ fontSize: '18px', fontWeight: 'bold', color: '#17a2b8', marginBottom: '5px' }}>
+                        {amount} {currency}
                     </div>
-                    <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
-                        <h3 style={{ margin: '0 0 10px 0', color: '#28a745' }}>{stats.totalPayments}</h3>
-                        <p style={{ margin: '0', color: '#666' }}>Total Payments</p>
-                    </div>
-                    <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
-                        <h3 style={{ margin: '0 0 10px 0', color: '#ffc107' }}>{stats.pendingPayments}</h3>
-                        <p style={{ margin: '0', color: '#666' }}>Pending Payments</p>
-                    </div>
-                    <div style={{ padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
-                        <h3 style={{ margin: '0 0 10px 0', color: '#17a2b8' }}>${stats.totalAmount}</h3>
-                        <p style={{ margin: '0', color: '#666' }}>Total Amount</p>
-                    </div>
-                </div>
-            )}
+                ))}
+            </div>
+            <p style={{ margin: '0', color: '#666' }}>Total by Currency</p>
+        </div>
+    </div>
+)}
 
             {/* Users Tab */}
             {activeTab === "users" && (

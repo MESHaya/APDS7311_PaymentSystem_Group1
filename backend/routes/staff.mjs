@@ -248,6 +248,7 @@ router.get("/payments", authenticateToken, requireStaff, async (req, res) => {
 });
 
 // Staff: Get dashboard statistics
+// Staff: Get dashboard statistics
 router.get("/dashboard-stats", authenticateToken, requireStaff, async (req, res) => {
   try {
     const usersCollection = await db.collection("users");
@@ -257,19 +258,23 @@ router.get("/dashboard-stats", authenticateToken, requireStaff, async (req, res)
     const totalPayments = await paymentsCollection.countDocuments();
     const pendingPayments = await paymentsCollection.countDocuments({ status: "pending" });
 
-    // Get total payment amount
+    // Get total payment amount BY CURRENCY
     const paymentStats = await paymentsCollection
       .aggregate([
         {
           $group: {
-            _id: null,
+            _id: "$currency",
             totalAmount: { $sum: { $toDouble: "$amount" } }
           }
         }
       ])
       .toArray();
 
-    const totalAmount = paymentStats.length > 0 ? paymentStats[0].totalAmount : 0;
+    // Convert to object format: { USD: 1234.56, EUR: 789.12, ... }
+    const totalAmountByCurrency = {};
+    paymentStats.forEach(stat => {
+      totalAmountByCurrency[stat._id] = stat.totalAmount.toFixed(2);
+    });
 
     res.status(200).json({
       message: "Dashboard stats retrieved successfully.",
@@ -277,7 +282,7 @@ router.get("/dashboard-stats", authenticateToken, requireStaff, async (req, res)
         totalUsers,
         totalPayments,
         pendingPayments,
-        totalAmount: totalAmount.toFixed(2)
+        totalAmountByCurrency // Changed from single totalAmount
       }
     });
   } catch (err) {
