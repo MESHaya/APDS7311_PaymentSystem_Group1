@@ -5,10 +5,10 @@
 3.	Start the server —
 - Navigate to backend folder in the terminal Command Prompt
   cd path/to/project/backend 
-  Example: C:\Users\user\APDS7311_PaymentSystem_Group1\backend> and then type npm start 
+  Example: C:\Users\user\APDS7311_PaymentSystem_Group1\APDS7311_PaymentSystem_Group1\backend> and then type npm start 
 - Open a new terminal and navigate to frontend folder in the terminal Command Prompt
   cd path/to/project/frontend 
-  Example: C:\Users\user\APDS\APDS7311_PaymentSystem_Group1\frontend> and then type npm start  
+  Example: C:\Users\user\APDS\APDS7311_PaymentSystem_Group1\APDS7311_PaymentSystem_Group1\frontend> and then type npm start  
 - An admin user is automatically generated on first run.
 ---------
    Username: admin
