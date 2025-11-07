@@ -37,10 +37,6 @@ export async function initializeAdmin() {
     
     console.log("*** Default admin user created successfully! ***");
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-    console.log("   ADMIN LOGIN CREDENTIALS:");
-    console.log("   Username: admin");
-    console.log("   Password: Admin@123");
-    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     console.log("!! Please change this password after first login!");
     
   } catch (error) {
