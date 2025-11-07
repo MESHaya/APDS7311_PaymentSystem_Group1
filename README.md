@@ -1,4 +1,47 @@
 # APDS7311_PaymentSystem_Group1
+## Running the Application
+1.	Clone the repository from GitHub to your local machine.
+2.	Navigate to the .env file inside the backend directory and add your MongoDB connection string using your own database credentials.
+3.	Start the server —
+- Navigate to backend folder in the terminal PS C:\Users\user\APDS7311_PaymentSystem_Group1\backend> and then type npm start 
+- Open a new terminal and navigate to frontend folder in the terminal PS C:\Users\user\APDS\APDS7311_PaymentSystem_Group1\frontend> and then type npm start  
+- An admin user is automatically generated on first run.
+---------
+   Username: admin
+   Password: Admin@123
+ ----------
+5.	Once the app is running, use the Staff Portal to log in with admin credentials and to then create general user accounts.
+-----
+Input Validation Rules (User Registration)
+All user information is strictly validated before being processed. A new user will only be registered if the following requirements are met:
+Full Name
+•	Only letters and spaces allowed
+•	Length: 1–50 characters
+
+ID Number
+•	Digits only
+•	Length: 6–20 digits
+
+Account Number
+•	Digits only
+•	Length: 6–20 digits
+
+Username
+•	Letters, numbers, and underscores only
+•	No spaces or other special characters
+•	Length: 3–20 characters
+
+Password
+•	Length: 8–20 characters
+•	Must include at least:
+1 uppercase letter
+1 lowercase letter
+1 number
+1 special character (@, $, !, %, *, ?, &)
+•	Spaces not allowed
+
+-------------------------------------
+
 ## Security Implementations
 1.	HTTPS Encryption
 All traffic is encrypted using SSL/TLS certificates. This ensures data transferred between the client and the server is secure and cannot be intercepted by attackers. It prevents man-in-the-middle (MITM) attacks and keeps sensitive information such as passwords and payment details private.
@@ -66,8 +109,7 @@ Applied Helmet, XSS, NoSQL Injection, CORS in Server.
  - Users see status update
 
  ------
- ## YouTube Link:
-
+ ## YouTube Link: https://youtu.be/y6YUVhVzdRA
  ------
  ### Group Members:
  Meshaya Munnhar
